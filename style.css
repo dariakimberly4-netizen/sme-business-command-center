@@ -7,3 +7,6 @@
 .pulse-grid small{display:block;color:#9fb7cc;font-size:10px}
 .pulse-grid b{display:block;font-size:20px;margin-top:5px}
 @media(max-width:520px){.pulse-grid{grid-template-columns:1fr 1fr}.pulse-grid b{font-size:16px}}
+
+.new-badge{display:block;font-size:9px;margin-top:4px}
+.center-action.new-center{border:2px solid #5b8db6;box-shadow:0 0 50px #38bdf82b}
