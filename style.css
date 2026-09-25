@@ -22,3 +22,8 @@
 
 .notification-new{border:4px solid #fff!important;box-shadow:0 0 0 5px #00d9ff,0 0 32px #00d9ff!important;font-weight:900!important}
 .notification-new .new-badge{display:inline-block;margin:0 6px 0 0;font-size:10px}
+
+.pulse-view .notification-new{display:block!important;width:calc(100% - 54px)!important;max-width:420px!important;margin:12px auto 8px!important;padding:13px 16px!important;position:relative!important;visibility:visible!important;opacity:1!important;background:#00d9ff!important;color:#00131a!important;border:4px solid #fff!important;border-radius:18px!important;box-shadow:0 0 0 5px #00d9ff,0 0 28px #00d9ff!important;cursor:pointer!important;line-height:1.15!important;z-index:50!important}
+.pulse-view .notification-new strong{display:block!important;font-size:16px!important}
+.pulse-view .notification-new small{display:block!important;color:#073047!important;font-size:10px!important;margin-top:4px!important}
+.pulse-view .notification-new .new-badge{display:block!important;font-size:9px!important;margin-bottom:4px!important}
