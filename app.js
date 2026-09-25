@@ -32,7 +32,7 @@ function exportAuditReport(a){
 }
 
 function home(){const entries=Object.entries(roles);app.innerHTML='<div class="shell"><section class="card orbit-first"><div class="orbit role-orbit"><div class="center"><div><strong>COMMAND<br>CENTER</strong><br><span>Choose a role</span></div></div>'+entries.map(([r,d],i)=>'<button class="module role-node" data-role="'+r+'" style="'+pos(i,entries.length)+'">'+r.toUpperCase()+'</button>').join("")+'</div><div class="orbit-caption"><small>SME BUSINESS COMMAND CENTER</small><h1>Choose Your Portal</h1></div></section></div>';document.querySelectorAll("[data-role]").forEach(b=>b.onclick=()=>portal(b.dataset.role))}
-function portal(role){let d=roles[role],st=loadState();if(role==="Owner"){d={...d,summary:money(st.sales)+" Today"}}app.innerHTML='<div class="shell"><section class="card portal-orbit-only"><button class="back floating-back">← Roles</button><div class="portal-label"><small>SME COMMAND CENTER</small><h2>'+role+' Portal</h2>'+(role==="Owner"?'<button id="ownerCloseTop" type="button" style="margin-top:10px;background:#00d9ff;color:#00131a;border:4px solid #fff;border-radius:999px;padding:9px 15px;box-shadow:0 0 0 5px #00d9ff,0 0 30px #00d9ff;font-weight:900;font-size:10px;cursor:pointer"><span style="font-size:8px;margin-right:4px">★ NEW</span>END-OF-DAY CLOSING</button>':'')+'</div><div class="orbit"><button class="center center-action" id="orbitCenter" type="button"><div><strong>'+d.center+'</strong><br><span>'+d.summary+'</span><em>Tap for snapshot</em></div></button>'+d.modules.map((m,i)=>'<button class="module'+(role==="Cashier"&&m==="Shift Reconciliation"?' new-feature':'')+'" data-m="'+m+'" style="'+pos(i,d.modules.length)+'">'+m+(role==="Cashier"&&m==="Shift Reconciliation"?'<span class="new-badge">★ NEW</span>':'')+'</button>').join("")+'</div></section></div>';document.querySelector(".back").onclick=home;document.querySelector("#orbitCenter").onclick=()=>openPulse(role);document.querySelectorAll(".module").forEach(b=>b.onclick=()=>openModule(role,b))};const oct=document.querySelector("#ownerCloseTop");if(oct)oct.onclick=()=>{let r=JSON.parse(localStorage.getItem("smeClosing")||"null");closingOwnerReview(r)}
+function portal(role){let d=roles[role],st=loadState();if(role==="Owner"){d={...d,summary:money(st.sales)+" Today"}}app.innerHTML='<div class="shell"><section class="card portal-orbit-only"><button class="back floating-back">← Roles</button><div class="portal-label"><small>SME COMMAND CENTER</small><h2>'+role+' Portal</h2>'+(role==="Owner"?'<div class="owner-tools"><button id="ownerCloseTop" type="button" class="owner-tool">END-OF-DAY CLOSING</button><button id="globalSearchTop" type="button" class="owner-tool global-search-new"><span>★ NEW</span> GLOBAL SEARCH</button></div>':'')+'</div><div class="orbit"><button class="center center-action" id="orbitCenter" type="button"><div><strong>'+d.center+'</strong><br><span>'+d.summary+'</span><em>Tap for snapshot</em></div></button>'+d.modules.map((m,i)=>'<button class="module" data-m="'+m+'" style="'+pos(i,d.modules.length)+'">'+m+'</button>').join("")+'</div></section></div>';document.querySelector(".back").onclick=home;document.querySelector("#orbitCenter").onclick=()=>openPulse(role);document.querySelectorAll(".module").forEach(b=>b.onclick=()=>openModule(role,b))};const oct=document.querySelector("#ownerCloseTop");if(oct)oct.onclick=()=>{let r=JSON.parse(localStorage.getItem("smeClosing")||"null");closingOwnerReview(r)};const gst=document.querySelector("#globalSearchTop");if(gst)gst.onclick=openGlobalSearch
 function pos(i,n){let a=(i/n)*Math.PI*2-Math.PI/2,r=41,x=50+r*Math.cos(a),y=50+r*Math.sin(a);return 'left:'+x+'%;top:'+y+'%;transform:translate(-50%,-50%)'}
 const ownerViews={
 "Live Sales":'<div class="demo-grid"><div><small>TODAY</small><b>₱48,650</b></div><div><small>TRANSACTIONS</small><b>126</b></div><div><small>AVG ORDER</small><b>₱386</b></div></div><p>Recent: #0126 ₱650 • #0125 ₱420 • #0124 ₱1,080</p>',
@@ -66,6 +66,36 @@ Staff:{
 "Orders":'<p>#126 Assigned • Preparing</p><button class="action">Update Status</button>',
 "Stock Requests":'<p>Request: Milk × 12</p><button class="action">Submit Request</button>',
 "Notifications":'<p>Shift updated • Stock request approved • Manager announcement</p><button class="action">Mark Read</button>'}};
+function searchCatalog(){
+ const st=loadState(),audit=getAudit();
+ return [
+  {type:"Order",title:"Order #126",detail:"Preparing • ₱650",module:"Live Sales"},
+  {type:"Order",title:"Order #125",detail:"Ready • ₱420",module:"Live Sales"},
+  {type:"Receipt",title:"Receipt #1048",detail:"Return • ₱1,250",module:"Approvals"},
+  {type:"Product",title:"Milk",detail:"Inventory • 4 left",module:"Inventory"},
+  {type:"Product",title:"Cups",detail:"Inventory • 12 left",module:"Inventory"},
+  {type:"Product",title:"Syrup",detail:"Inventory • 2 left",module:"Inventory"},
+  {type:"Employee",title:"Donna",detail:"On shift • 31 completed tasks",module:"People"},
+  {type:"Supplier",title:"Metro Supply Co.",detail:"Supplier / Purchasing",module:"Suppliers & Purchasing"},
+  {type:"Purchase Order",title:"PO-205",detail:"₱8,500",module:"Suppliers & Purchasing"},
+  {type:"Expense",title:"Latest Expense",detail:st.lastExpense?(st.lastExpense.type+" • "+money(st.lastExpense.amount)):"No saved expense",module:"Profit & Expenses"},
+  ...audit.map(x=>({type:"Audit",title:x.action,detail:x.detail+" • "+x.role,module:"Audit Trail"}))
+ ];
+}
+function openGlobalSearch(){
+ app.innerHTML='<div class="shell"><section class="card workspace"><button class="back orbit-back">← Back to Owner Orbit</button><div class="workspace-circle module-demo search-view"><small>OWNER • FIND ANYTHING</small><h2>Global Search</h2><div class="global-search-box"><input id="globalQuery" type="search" placeholder="Order, receipt, product, employee, supplier, PO..."><button id="runGlobalSearch">Search</button></div><div class="search-chips"><button data-q="Order">Orders</button><button data-q="Product">Products</button><button data-q="Employee">Employees</button><button data-q="Supplier">Suppliers</button><button data-q="PO-">POs</button><button data-q="Audit">Audit</button></div><div id="globalResults" class="global-results"><p>Search across your business from one place.</p></div></div></section></div>';
+ document.querySelector(".back").onclick=()=>portal("Owner");
+ const q=document.querySelector("#globalQuery"),run=()=>renderGlobalResults(q.value);
+ document.querySelector("#runGlobalSearch").onclick=run;q.oninput=run;q.onkeydown=e=>{if(e.key==="Enter")run()};
+ document.querySelectorAll(".search-chips button").forEach(b=>b.onclick=()=>{q.value=b.dataset.q;run()});
+}
+function renderGlobalResults(q){
+ q=(q||"").trim().toLowerCase();const box=document.querySelector("#globalResults");
+ if(!q){box.innerHTML='<p>Search across your business from one place.</p>';return}
+ const rows=searchCatalog().filter(x=>(x.type+" "+x.title+" "+x.detail).toLowerCase().includes(q));
+ box.innerHTML=rows.length?rows.map((x,i)=>'<button class="search-result" data-i="'+i+'"><small>'+x.type+'</small><b>'+x.title+'</b><span>'+x.detail+'</span></button>').join(""):'<div class="search-empty">No matching business record found.</div>';
+ document.querySelectorAll(".search-result").forEach((b,i)=>b.onclick=()=>{const x=rows[i];if(x.module==="Audit Trail")openAudit();else openModule("Owner",{dataset:{m:x.module}})});
+}
 function openPulse(role){
  const data={
   Owner:{title:"Executive Snapshot",items:[["Sales Today",money(loadState().sales)],["Expenses",money(loadState().expenses)],["Est. Profit",money(loadState().profit)],["Alerts",String(loadState().alerts)]],note:"Live values saved on this device"},
