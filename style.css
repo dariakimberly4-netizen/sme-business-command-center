@@ -10,3 +10,10 @@
 
 .new-badge{display:block;font-size:9px;margin-top:4px}
 .center-action.new-center{border:2px solid #5b8db6;box-shadow:0 0 50px #38bdf82b}
+
+.alerts-list{display:grid;gap:9px;margin:14px 0;text-align:left}
+.alert-item{width:100%;border:1px solid #31597c;background:#0d2a45;color:#fff;border-radius:14px;padding:12px 14px;cursor:pointer;text-align:left}
+.alert-item b,.alert-item span{display:block}
+.alert-item span{font-size:11px;color:#aac0d3;margin-top:4px}
+.alert-item.urgent{border-color:#e2a94b}
+.alert-hint{font-size:12px}
