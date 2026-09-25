@@ -1,5 +1,5 @@
 const roles={
-Owner:{modules:["Live Sales","Profit & Expenses","Inventory Alerts","Employee Performance","Daily Reports"],center:"BUSINESS PULSE",summary:"₱48,650 Today",metrics:[["Sales","₱48,650"],["Profit","₱16,240"],["Alerts","3"]]},
+Owner:{modules:["Live Sales","Profit & Expenses","Inventory","People","Approvals","Reports"],center:"BUSINESS PULSE",summary:"₱48,650 Today",metrics:[["Sales","₱48,650"],["Profit","₱16,240"],["Alerts","3"]]},
 Manager:{modules:["Operations","Staff Scheduling","Inventory","Purchase Orders","Approvals","Reports"],center:"OPERATIONS LIVE",summary:"2 approvals pending",metrics:[["On Shift","8"],["Low Stock","4"],["POs","2"]]},
 Cashier:{modules:["POS","Orders","Payments","Discounts","Returns","Shift Reconciliation"],center:"CURRENT SHIFT",summary:"Terminal 01 • Open",metrics:[["Orders","37"],["Sales","₱21,840"],["Returns","1"]]},
 Staff:{modules:["Tasks","Attendance","Orders","Stock Requests","Notifications"],center:"MY SHIFT",summary:"Clocked in • 8:03 AM",metrics:[["Tasks","6"],["Done","3"],["Alerts","2"]]}
@@ -8,6 +8,10 @@ function home(){const entries=Object.entries(roles);app.innerHTML='<div class="s
 function portal(role){let d=roles[role];app.innerHTML='<div class="shell"><section class="card portal-orbit-only"><button class="back floating-back">← Roles</button><div class="portal-label"><small>SME COMMAND CENTER</small><h2>'+role+' Portal</h2></div><div class="orbit"><div class="center"><div><strong>'+d.center+'</strong><br><span>'+d.summary+'</span></div></div>'+d.modules.map((m,i)=>'<button class="module" data-m="'+m+'" style="'+pos(i,d.modules.length)+'">'+m+'</button>').join("")+'</div></section></div>';document.querySelector(".back").onclick=home;document.querySelectorAll(".module").forEach(b=>b.onclick=()=>openModule(role,b))}
 function pos(i,n){let a=(i/n)*Math.PI*2-Math.PI/2,r=41,x=50+r*Math.cos(a),y=50+r*Math.sin(a);return 'left:'+x+'%;top:'+y+'%;transform:translate(-50%,-50%)'}
 const ownerViews={
+"Inventory":'<p>Stock health • Low-stock alerts • Fast/slow movers • Inventory value • Stock adjustments</p>',
+"People":'<p>Attendance • Employee performance • Sales handled • Tasks completed • Staff productivity</p>',
+"Approvals":'<p>Refunds • Voids • Discounts • Purchase requests • Expense approvals • Exceptions</p>',
+"Reports":'<p>Daily sales • Profit • Cash • Inventory movement • Expenses • Exceptions • Export</p>',
 "Live Sales":'<span class="metric">Today<b>₱48,650</b></span><span class="metric">Transactions<b>126</b></span><span class="metric">Avg Order<b>₱386</b></span><p>Live transaction feed • Hourly sales • Best sellers • Branch comparison</p>',
 "Profit & Expenses":'<span class="metric">Revenue<b>₱48,650</b></span><span class="metric">Expenses<b>₱12,410</b></span><span class="metric">Est. Profit<b>₱16,240</b></span><p>Revenue • COGS • Operating expenses • Expense entry</p>',
 "Inventory Alerts":'<span class="metric">Low Stock<b>3</b></span><span class="metric">Out of Stock<b>1</b></span><span class="metric">Expiring<b>2</b></span><p>Low stock • Out of stock • Expiring • Fast/slow movers</p>',
