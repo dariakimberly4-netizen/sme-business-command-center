@@ -10,11 +10,25 @@ function saveState(st){localStorage.setItem("smeState",JSON.stringify(st))}
 function money(n){return "₱"+Number(n||0).toLocaleString()}
 function getAudit(){try{return JSON.parse(localStorage.getItem("smeAudit")||"[]")}catch(e){return []}}
 function addAudit(action,detail,role){let a=getAudit();a.unshift({action:action,detail:detail,role:role||"Owner",time:new Date().toLocaleString()});localStorage.setItem("smeAudit",JSON.stringify(a.slice(0,50)))}
-function openAudit(){
- let a=getAudit();if(!a.length)a=[{action:"System Ready",detail:"Audit Trail activated",role:"System",time:new Date().toLocaleString()}];
- app.innerHTML='<div class="shell"><section class="card workspace"><button class="back orbit-back">← Back to Owner Orbit</button><div class="workspace-circle module-demo audit-view"><small>OWNER • CONTROL</small><h2>Audit Trail</h2><div class="audit-list">'+a.map(x=>'<div class="audit-row"><div><b>'+x.action+'</b><span>'+x.detail+'</span></div><div class="audit-meta">'+x.role+'<br>'+x.time+'</div></div>').join("")+'</div><button class="action" id="clearAudit">Clear Demo Log</button></div></section></div>';
+function openAudit(filter){
+ let a=getAudit();if(!a.length)a=[{action:"System Ready",detail:"Audit Trail activated",role:"System",time:new Date().toLocaleString(),target:""}];
+ filter=filter||"All";
+ let rows=a.filter(x=>filter==="All"||(filter==="Today"&&new Date(x.time).toDateString()===new Date().toDateString())||x.role===filter);
+ app.innerHTML='<div class="shell"><section class="card workspace"><button class="back orbit-back">← Back to Owner Orbit</button><div class="workspace-circle module-demo audit-view"><small>OWNER • CONTROL</small><h2>Audit Trail</h2><div class="audit-filters"><button data-filter="All">All</button><button data-filter="Today">Today</button><button data-filter="Owner">Owner</button><button data-filter="Manager">Manager</button><button data-filter="Cashier">Cashier</button><button data-filter="Staff">Staff</button></div><div class="audit-list">'+rows.map((x,i)=>'<button class="audit-row audit-open" data-i="'+i+'"><div><b>'+x.action+'</b><span>'+x.detail+'</span></div><div class="audit-meta">'+x.role+'<br>'+x.time+'</div></button>').join("")+'</div><button class="action" id="exportAudit">Export Audit Report</button> <button class="action" id="clearAudit">Clear Demo Log</button></div></section></div>';
  document.querySelector(".back").onclick=()=>portal("Owner");
+ document.querySelectorAll(".audit-filters button").forEach(b=>b.onclick=()=>openAudit(b.dataset.filter));
+ document.querySelectorAll(".audit-open").forEach((b,i)=>b.onclick=()=>openAuditDetail(rows[i]));
+ document.querySelector("#exportAudit").onclick=()=>exportAuditReport(a);
  document.querySelector("#clearAudit").onclick=function(){localStorage.removeItem("smeAudit");openAudit()};
+}
+function openAuditDetail(x){
+ app.innerHTML='<div class="shell"><section class="card workspace"><button class="back orbit-back">← Audit Trail</button><div class="workspace-circle module-demo audit-view"><small>AUDIT RECORD</small><h2>'+x.action+'</h2><div class="audit-detail"><p><b>Details</b><br>'+x.detail+'</p><p><b>Role / User</b><br>'+x.role+'</p><p><b>Date & Time</b><br>'+x.time+'</p></div><button class="action primary" id="relatedAudit">Open Related Module</button></div></section></div>';
+ document.querySelector(".back").onclick=()=>openAudit();
+ document.querySelector("#relatedAudit").onclick=()=>{let t=(x.action||"").toLowerCase();if(t.includes("expense"))openModule("Owner",{dataset:{m:"Profit & Expenses"}});else if(t.includes("purchase"))openModule("Owner",{dataset:{m:"Suppliers & Purchasing"}});else if(t.includes("stock"))openModule("Owner",{dataset:{m:"Inventory"}});else if(t.includes("refund")||t.includes("approval"))openModule("Owner",{dataset:{m:"Approvals"}});else openPulse("Owner")};
+}
+function exportAuditReport(a){
+ let lines=["SME BUSINESS COMMAND CENTER - AUDIT REPORT","Generated: "+new Date().toLocaleString(),"",...a.map(x=>x.time+" | "+x.role+" | "+x.action+" | "+x.detail)];
+ let blob=new Blob([lines.join("\n")],{type:"text/plain"}),url=URL.createObjectURL(blob),link=document.createElement("a");link.href=url;link.download="SME-Audit-Report.txt";document.body.appendChild(link);link.click();link.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);
 }
 
 function home(){const entries=Object.entries(roles);app.innerHTML='<div class="shell"><section class="card orbit-first"><div class="orbit role-orbit"><div class="center"><div><strong>COMMAND<br>CENTER</strong><br><span>Choose a role</span></div></div>'+entries.map(([r,d],i)=>'<button class="module role-node" data-role="'+r+'" style="'+pos(i,entries.length)+'">'+r.toUpperCase()+'</button>').join("")+'</div><div class="orbit-caption"><small>SME BUSINESS COMMAND CENTER</small><h1>Choose Your Portal</h1></div></section></div>';document.querySelectorAll("[data-role]").forEach(b=>b.onclick=()=>portal(b.dataset.role))}
