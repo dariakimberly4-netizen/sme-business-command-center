@@ -8,6 +8,14 @@ const DEFAULT_STATE={sales:48650,expenses:12410,profit:17040,cash:18450,alerts:3
 function loadState(){try{return Object.assign({},DEFAULT_STATE,JSON.parse(localStorage.getItem("smeState")||"{}"))}catch(e){return {...DEFAULT_STATE}}}
 function saveState(st){localStorage.setItem("smeState",JSON.stringify(st))}
 function money(n){return "₱"+Number(n||0).toLocaleString()}
+function getAudit(){try{return JSON.parse(localStorage.getItem("smeAudit")||"[]")}catch(e){return []}}
+function addAudit(action,detail,role){let a=getAudit();a.unshift({action:action,detail:detail,role:role||"Owner",time:new Date().toLocaleString()});localStorage.setItem("smeAudit",JSON.stringify(a.slice(0,50)))}
+function openAudit(){
+ let a=getAudit();if(!a.length)a=[{action:"System Ready",detail:"Audit Trail activated",role:"System",time:new Date().toLocaleString()}];
+ app.innerHTML='<div class="shell"><section class="card workspace"><button class="back orbit-back">← Back to Owner Orbit</button><div class="workspace-circle module-demo audit-view"><small>OWNER • CONTROL</small><h2>Audit Trail</h2><div class="audit-list">'+a.map(x=>'<div class="audit-row"><div><b>'+x.action+'</b><span>'+x.detail+'</span></div><div class="audit-meta">'+x.role+'<br>'+x.time+'</div></div>').join("")+'</div><button class="action" id="clearAudit">Clear Demo Log</button></div></section></div>';
+ document.querySelector(".back").onclick=()=>portal("Owner");
+ document.querySelector("#clearAudit").onclick=function(){localStorage.removeItem("smeAudit");openAudit()};
+}
 
 function home(){const entries=Object.entries(roles);app.innerHTML='<div class="shell"><section class="card orbit-first"><div class="orbit role-orbit"><div class="center"><div><strong>COMMAND<br>CENTER</strong><br><span>Choose a role</span></div></div>'+entries.map(([r,d],i)=>'<button class="module role-node" data-role="'+r+'" style="'+pos(i,entries.length)+'">'+r.toUpperCase()+'</button>').join("")+'</div><div class="orbit-caption"><small>SME BUSINESS COMMAND CENTER</small><h1>Choose Your Portal</h1></div></section></div>';document.querySelectorAll("[data-role]").forEach(b=>b.onclick=()=>portal(b.dataset.role))}
 function portal(role){let d=roles[role],st=loadState();if(role==="Owner"){d={...d,summary:money(st.sales)+" Today"}}app.innerHTML='<div class="shell"><section class="card portal-orbit-only"><button class="back floating-back">← Roles</button><div class="portal-label"><small>SME COMMAND CENTER</small><h2>'+role+' Portal</h2></div><div class="orbit"><button class="center center-action" id="orbitCenter" type="button"><div><strong>'+d.center+'</strong><br><span>'+d.summary+'</span><em>Tap for snapshot</em></div></button>'+d.modules.map((m,i)=>'<button class="module'+(false?' new-feature':'')+'" data-m="'+m+'" style="'+pos(i,d.modules.length)+'">'+m+(false?'<span class="new-badge">★ NEW</span>':'')+'</button>').join("")+'</div></section></div>';document.querySelector(".back").onclick=home;document.querySelector("#orbitCenter").onclick=()=>openPulse(role);document.querySelectorAll(".module").forEach(b=>b.onclick=()=>openModule(role,b))}
@@ -51,8 +59,8 @@ function openPulse(role){
   Cashier:{title:"Shift Summary",items:[["Shift Sales","₱21,840"],["Transactions","37"],["Variance","₱0"],["Terminal","01 • Open"]],note:"Current shift"},
   Staff:{title:"My Day",items:[["Clock In","8:03 AM"],["Tasks Left","3"],["Orders","1"],["Alerts","2"]],note:"Shift activity"}
  }[role];
- app.innerHTML='<div class="shell"><section class="card workspace"><button class="back orbit-back">← Back to '+role+' Orbit</button><div class="workspace-circle module-demo pulse-view"><small>'+role.toUpperCase()+' • ORBIT CENTER</small><h2>'+data.title+'</h2><div class="pulse-grid">'+data.items.map(x=>'<div><small>'+x[0]+'</small><b>'+x[1]+'</b></div>').join("")+'</div>'+(role==="Owner"?'<button class="notification-new" id="openNotifications" type="button"><span class="new-badge">★ NEW</span><strong>Notification Center</strong><small>3 alerts need attention</small></button>':'')+'<p>'+data.note+'</p></div></section></div>';
- document.querySelector(".back").onclick=()=>portal(role);const nc=document.querySelector("#openNotifications");if(nc)nc.onclick=()=>openModule("Owner",{dataset:{m:"Notification Center"}});
+ app.innerHTML='<div class="shell"><section class="card workspace"><button class="back orbit-back">← Back to '+role+' Orbit</button><div class="workspace-circle module-demo pulse-view"><small>'+role.toUpperCase()+' • ORBIT CENTER</small><h2>'+data.title+'</h2><div class="pulse-grid">'+data.items.map(x=>'<div><small>'+x[0]+'</small><b>'+x[1]+'</b></div>').join("")+'</div>'+(role==="Owner"?'<button class="snapshot-action" id="openNotifications" type="button"><strong>Notification Center</strong><small>3 alerts need attention</small></button><button class="snapshot-action audit-new" id="openAudit" type="button"><span class="new-badge">★ NEW</span><strong>Audit Trail</strong><small>View business activity history</small></button>':'')+'<p>'+data.note+'</p></div></section></div>';
+ document.querySelector(".back").onclick=()=>portal(role);const nc=document.querySelector("#openNotifications");if(nc)nc.onclick=()=>openModule("Owner",{dataset:{m:"Notification Center"}});const at=document.querySelector("#openAudit");if(at)at.onclick=openAudit;
 }
 function openModule(role,b){let name=b.dataset.m,st=loadState();if(role==="Owner"&&name==="Cash & Bank"){ownerViews[name]='<div class="demo-grid"><div><small>CASH</small><b>'+money(st.cash)+'</b></div><div><small>GCASH</small><b>₱12,800</b></div><div><small>CARD</small><b>₱17,400</b></div></div><p>Updated from saved business activity</p><button class="action">Reconcile Shift</button>'}if(role==="Owner"&&name==="Reports"){ownerViews[name]=ownerViews[name].replace(/Today ₱[\d,]+/,'Today '+money(st.expenses))}if(role==="Owner"&&name==="Profit & Expenses"){ownerViews[name]='<div class="demo-grid"><div><small>REVENUE</small><b>'+money(st.sales)+'</b></div><div><small>EXPENSES</small><b>'+money(st.expenses)+'</b></div><div><small>EST. PROFIT</small><b>'+money(st.profit)+'</b></div></div>'+(st.lastExpense?'<p>Last expense: '+st.lastExpense.type+' • '+money(st.lastExpense.amount)+'</p>':'')+'<button class="action">+ Add Expense</button>'}let detail=role==="Owner"&&ownerViews[name]?ownerViews[name]:(roleExamples[role]&&roleExamples[role][name]?roleExamples[role][name]:'<p>Sample workspace for '+name+'</p>');app.innerHTML='<div class="shell"><section class="card workspace"><button class="back orbit-back">← Back to '+role+' Orbit</button><div class="workspace-circle module-demo"><small>'+role.toUpperCase()+' WORKSPACE</small><h2>'+name+'</h2>'+detail+'</div></section></div>';document.querySelector(".back").onclick=()=>portal(role);bindActions(role,name);document.querySelectorAll(".alert-item").forEach(a=>a.onclick=()=>openModule("Owner",{dataset:{m:a.dataset.target}}))}
 function bindActions(role,name){
@@ -74,7 +82,7 @@ function addExpenseForm(){
    const amount=Number(document.querySelector("#expenseAmount").value||0);
    const type=document.querySelector("#expenseType").value;
    const st=loadState(),previous=st.expenses;
-   st.expenses+=amount;st.profit=Math.max(0,st.profit-amount);st.cash=Math.max(0,st.cash-amount);st.lastExpense={type:type,amount:amount,at:new Date().toISOString()};saveState(st);
+   st.expenses+=amount;st.profit=Math.max(0,st.profit-amount);st.cash=Math.max(0,st.cash-amount);st.lastExpense={type:type,amount:amount,at:new Date().toISOString()};saveState(st);addAudit("Expense Added",type+" • "+money(amount),"Owner");
    el.innerHTML='<small>EXPENSE RECORDED</small><h2>'+money(amount)+'</h2><span class="status approved">Saved</span><p>'+type+' has been added and synced across the Owner portal.</p><div class="demo-grid"><div><small>PREVIOUS EXPENSES</small><b>'+money(previous)+'</b></div><div><small>UPDATED EXPENSES</small><b>'+money(st.expenses)+'</b></div><div><small>UPDATED PROFIT</small><b>'+money(st.profit)+'</b></div></div><button class="action primary" id="anotherExpense">+ Add Another</button> <button class="action" id="backProfit">← Profit & Expenses</button>';
    document.querySelector("#anotherExpense").onclick=addExpenseForm;
    document.querySelector("#backProfit").onclick=function(){openModule("Owner",{dataset:{m:"Profit & Expenses"}})};
@@ -87,7 +95,7 @@ function poForm(role,name){
  el.innerHTML='<small>'+role.toUpperCase()+' WORKSPACE</small><h2>Create Purchase Order</h2><div class="po-form"><label>Supplier<input value="Metro Supply Co."></label><label>Item<input value="Premium Coffee Beans"></label><label>Quantity<input type="number" value="20"></label><label>Unit Cost<input type="number" value="425"></label><label>Delivery Date<input type="date"></label><label>Notes<textarea>Restock for next week</textarea></label><button class="action" id="savePO">Create P.O.</button></div>';
  document.querySelector("#savePO").onclick=function(){poCreated(role)};
 }
-function poCreated(role){
+function poCreated(role){addAudit("Purchase Order Created","PO-205 • Metro Supply Co. • ₱8,500",role);
  const el=document.querySelector(".module-demo");
  el.innerHTML='<small>PURCHASE ORDER CREATED</small><h2>PO-205</h2><span class="status pending">Pending Approval</span><p>Metro Supply Co.<br>20 × Premium Coffee Beans<br>Total: ₱8,500</p><div class="po-actions"><button class="action primary" id="submitPO">Submit for Approval</button><button class="action" id="editPO">Edit</button><button class="action danger" id="cancelPO">Cancel</button></div>';
  document.querySelector("#submitPO").onclick=function(){poSubmitted(role)};
@@ -105,7 +113,7 @@ function approvalPO(role){
  document.querySelector("#approvePO").onclick=function(){poApproved(role)};
  document.querySelector("#rejectPO").onclick=function(){portal(role)};
 }
-function poApproved(role){
+function poApproved(role){addAudit("Purchase Order Approved","PO-205 • ₱8,500",role);
  const el=document.querySelector(".module-demo");
  el.innerHTML='<small>PURCHASE ORDER</small><h2>PO-205</h2><span class="status approved">Approved</span><p>Ready to send to Metro Supply Co.</p><button class="action primary" id="sendSupplier">Send to Supplier</button>';
  const btn=document.querySelector("#sendSupplier");
