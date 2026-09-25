@@ -47,8 +47,21 @@ function bindActions(role,name){
  document.querySelectorAll(".action:not(.export-btn)").forEach(btn=>btn.onclick=function(){
    let label=this.textContent.trim();
    if(/create\s*p\.?\s*o/i.test(label)) return poForm(role,name);
+   if(role==="Owner"&&name==="Profit & Expenses"&&/add expense/i.test(label)) return addExpenseForm();
    this.textContent="✓ "+label.replace(/^✓ /,"");this.disabled=true;
  });
+}
+function addExpenseForm(){
+ const el=document.querySelector(".module-demo");
+ el.innerHTML='<small>OWNER WORKSPACE</small><h2>Add Expense</h2><div class="po-form"><label>Expense Type<select id="expenseType"><option>Supplies</option><option>Utilities</option><option>Rent</option><option>Payroll</option><option>Other</option></select></label><label>Amount<input id="expenseAmount" type="number" value="850"></label><label>Date<input id="expenseDate" type="date"></label><label>Reference<input id="expenseRef" value="OR-2026-001"></label><label style="grid-column:1/-1">Notes<textarea id="expenseNotes">Business expense</textarea></label></div><button class="action primary" id="saveExpense">Save Expense</button> <button class="action" id="cancelExpense">Cancel</button>';
+ document.querySelector("#saveExpense").onclick=function(){
+   const amount=Number(document.querySelector("#expenseAmount").value||0);
+   const type=document.querySelector("#expenseType").value;
+   el.innerHTML='<small>EXPENSE RECORDED</small><h2>₱'+amount.toLocaleString()+'</h2><span class="status approved">Saved</span><p>'+type+' has been added to today’s expenses.</p><div class="demo-grid"><div><small>PREVIOUS EXPENSES</small><b>₱12,410</b></div><div><small>NEW EXPENSE</small><b>₱'+amount.toLocaleString()+'</b></div><div><small>UPDATED TOTAL</small><b>₱'+(12410+amount).toLocaleString()+'</b></div></div><button class="action primary" id="anotherExpense">+ Add Another</button> <button class="action" id="backProfit">← Profit & Expenses</button>';
+   document.querySelector("#anotherExpense").onclick=addExpenseForm;
+   document.querySelector("#backProfit").onclick=function(){openModule("Owner",{dataset:{m:"Profit & Expenses"}})};
+ };
+ document.querySelector("#cancelExpense").onclick=function(){openModule("Owner",{dataset:{m:"Profit & Expenses"}})};
 }
 function poForm(role,name){
  const el=document.querySelector(".module-demo");
