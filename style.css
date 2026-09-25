@@ -44,3 +44,18 @@
 .audit-detail{background:#0d2a45;border:1px solid #31597c;border-radius:18px;padding:14px;text-align:left;margin:14px 0}
 .audit-detail p{margin:9px 0}
 @media(max-width:520px){.audit-view{border-radius:28px;aspect-ratio:auto;min-height:70vh;width:88vw;padding:40px 22px}.audit-list{max-height:330px}.audit-row{align-items:flex-start}}
+
+/* v55: Audit Trail must be a mobile panel, never a clipped circle */
+.audit-view{width:min(620px,92vw)!important;aspect-ratio:auto!important;min-height:560px!important;border-radius:30px!important;place-content:start!important;padding:46px 28px 28px!important;overflow:visible!important}
+.audit-view h2{margin:8px 0 12px!important}
+.audit-view .audit-filters{display:flex!important;visibility:visible!important;opacity:1!important}
+.audit-view #exportAudit{display:inline-block!important;visibility:visible!important;opacity:1!important}
+.audit-view .audit-list{width:100%!important;max-height:310px!important;overflow:auto!important}
+@media(max-width:520px){
+ .workspace:has(.audit-view){display:block!important;padding-top:100px!important}
+ .workspace:has(.audit-view) .orbit-back{top:24px!important;left:24px!important}
+ .audit-view{width:100%!important;min-height:620px!important;padding:34px 16px 24px!important;border-radius:26px!important}
+ .audit-view .audit-filters{gap:5px!important}
+ .audit-view .audit-filters button{padding:7px 9px!important}
+ .audit-view .audit-row{display:flex!important}
+}
