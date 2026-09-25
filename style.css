@@ -36,3 +36,11 @@
 .audit-row{display:flex;justify-content:space-between;gap:12px;background:#0d2a45;border:1px solid #31597c;border-radius:13px;padding:11px}
 .audit-row b,.audit-row span{display:block}.audit-row span{font-size:10px;color:#aac0d3;margin-top:3px}
 .audit-meta{text-align:right;font-size:9px;color:#8faac0;white-space:nowrap}
+
+.audit-filters{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;margin:10px 0}
+.audit-filters button{border:1px solid #416d91;background:#0d2a45;color:#fff;border-radius:999px;padding:6px 10px;font-size:9px;cursor:pointer}
+.audit-open{width:100%;color:#fff;cursor:pointer;text-align:left;font:inherit}
+.audit-open:hover{border-color:#7dd3fc}
+.audit-detail{background:#0d2a45;border:1px solid #31597c;border-radius:18px;padding:14px;text-align:left;margin:14px 0}
+.audit-detail p{margin:9px 0}
+@media(max-width:520px){.audit-view{border-radius:28px;aspect-ratio:auto;min-height:70vh;width:88vw;padding:40px 22px}.audit-list{max-height:330px}.audit-row{align-items:flex-start}}
