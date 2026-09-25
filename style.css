@@ -70,3 +70,19 @@
 .owner-closing{background:#00d9ff!important;color:#00131a!important;border:4px solid #fff!important;box-shadow:0 0 0 5px #00d9ff,0 0 30px #00d9ff!important;font-weight:900!important}
 .owner-closing small{color:#073047!important}.owner-closing .new-badge{display:block!important;font-size:9px!important;margin-bottom:3px!important}
 .closing-empty{background:#0d2a45;border:1px solid #31597c;border-radius:18px;padding:18px;margin:16px 0}
+
+.owner-tools{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.owner-tool{border:1px solid #416d91;background:#102842;color:#fff;border-radius:999px;padding:8px 12px;font-size:9px;font-weight:800;cursor:pointer}
+.global-search-new{background:#00d9ff!important;color:#00131a!important;border:4px solid #fff!important;box-shadow:0 0 0 5px #00d9ff,0 0 30px #00d9ff!important}
+.global-search-new span{font-size:8px}
+.search-view{aspect-ratio:auto!important;min-height:620px!important;border-radius:30px!important}
+.global-search-box{display:flex;gap:7px;margin:14px 0}
+.global-search-box input{flex:1;min-width:0;border:1px solid #416d91;background:#081c30;color:#fff;border-radius:999px;padding:12px 15px}
+.global-search-box button,.search-chips button{border:1px solid #416d91;background:#173e61;color:#fff;border-radius:999px;padding:9px 13px;cursor:pointer}
+.search-chips{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;margin-bottom:12px}
+.search-chips button{font-size:9px;padding:6px 9px}
+.global-results{display:grid;gap:8px;max-height:350px;overflow:auto}
+.search-result{display:block;width:100%;text-align:left;border:1px solid #31597c;background:#0d2a45;color:#fff;border-radius:14px;padding:11px 13px;cursor:pointer}
+.search-result small,.search-result b,.search-result span{display:block}.search-result small{color:#7dd3fc;font-size:9px}.search-result span{color:#aac0d3;font-size:10px;margin-top:3px}
+.search-empty{padding:18px;background:#0d2a45;border-radius:14px;color:#aac0d3}
+@media(max-width:520px){.search-view{width:90vw!important;min-height:650px!important;padding:40px 18px!important}.global-search-box{flex-direction:column}.owner-tools{max-width:250px}}
