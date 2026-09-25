@@ -19,3 +19,6 @@
 .alert-hint{font-size:12px}
 
 #openNotifications{border:4px solid #fff;box-shadow:0 0 0 5px #00d9ff,0 0 30px #00d9ff;font-weight:900}
+
+.notification-new{border:4px solid #fff!important;box-shadow:0 0 0 5px #00d9ff,0 0 32px #00d9ff!important;font-weight:900!important}
+.notification-new .new-badge{display:inline-block;margin:0 6px 0 0;font-size:10px}
