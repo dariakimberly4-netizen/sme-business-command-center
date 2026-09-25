@@ -17,3 +17,5 @@
 .alert-item span{font-size:11px;color:#aac0d3;margin-top:4px}
 .alert-item.urgent{border-color:#e2a94b}
 .alert-hint{font-size:12px}
+
+#openNotifications{border:4px solid #fff;box-shadow:0 0 0 5px #00d9ff,0 0 30px #00d9ff;font-weight:900}
