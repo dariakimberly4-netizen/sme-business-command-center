@@ -17,4 +17,25 @@ const ownerViews={
 "Suppliers & Purchasing":'<div class="demo-grid"><div><small>SUPPLIERS</small><b>12</b></div><div><small>OPEN PO</small><b>3</b></div><div><small>PAYABLE</small><b>₱24,600</b></div></div><p>2 deliveries arriving today</p><button class="action">+ Create PO</button>',
 "Reports":'<p>Daily Sales • Profit & Loss • Expenses • Inventory • Staff • Cash Reconciliation</p><button class="action">Export PDF</button> <button class="action">Export Excel</button>'
 };
-function openModule(role,b){let name=b.dataset.m,detail=role==="Owner"&&ownerViews[name]?ownerViews[name]:'<p>Sample workspace for '+name+'</p>';app.innerHTML='<div class="shell"><section class="card workspace"><button class="back orbit-back">← Back to '+role+' Orbit</button><div class="workspace-circle module-demo"><small>'+role.toUpperCase()+' WORKSPACE</small><h2>'+name+'</h2>'+detail+'</div></section></div>';document.querySelector(".back").onclick=()=>portal(role)}home();
+const roleExamples={
+Manager:{
+"Operations":'<div class="demo-grid"><div><small>OPEN ORDERS</small><b>14</b></div><div><small>ISSUES</small><b>2</b></div><div><small>ON SHIFT</small><b>8</b></div></div><button class="action">View Operations</button>',
+"Staff Scheduling":'<p>Donna 8AM–5PM • Carlo 9AM–6PM • Mia 10AM–7PM</p><button class="action">Reassign Shift</button>',
+"Inventory":'<p>Milk 4 left • Cups 12 left • Syrup 2 left</p><button class="action">Stock Count</button>',
+"Purchase Orders":'<p>PO-204 ₱8,500 Pending • PO-203 ₱12,300 In Transit</p><button class="action">+ Create PO</button>',
+"Approvals":'<p>2 staff requests awaiting approval</p><button class="action">Approve Request</button>',
+"Reports":'<p>Branch Sales • Staff • Inventory • Exceptions</p><button class="action">Export Report</button>'},
+Cashier:{
+"POS":'<p>Iced Coffee ₱180 • Sandwich ₱220 • Cake ₱160</p><button class="action">Add to Cart</button><button class="action">Checkout</button>',
+"Orders":'<p>#126 Preparing • #125 Ready • #124 Completed</p><button class="action">Mark Ready</button>',
+"Payments":'<p>Total ₱650</p><button class="action">Cash</button> <button class="action">GCash</button> <button class="action">Card</button>',
+"Discounts":'<p>Senior • PWD • Promo</p><button class="action">Apply Discount</button>',
+"Returns":'<p>Receipt #1048 • ₱1,250</p><button class="action">Process Return</button>',
+"Shift Reconciliation":'<p>Expected ₱18,450 • Actual ₱18,450 • Variance ₱0</p><button class="action">Close Shift</button>'},
+Staff:{
+"Tasks":'<p>Restock cups • Clean counter • Prepare pickup #126</p><button class="action">Complete Task</button>',
+"Attendance":'<p>Clocked in 8:03 AM</p><button class="action">Clock Out</button>',
+"Orders":'<p>#126 Assigned • Preparing</p><button class="action">Update Status</button>',
+"Stock Requests":'<p>Request: Milk × 12</p><button class="action">Submit Request</button>',
+"Notifications":'<p>Shift updated • Stock request approved • Manager announcement</p><button class="action">Mark Read</button>'}};
+function openModule(role,b){let name=b.dataset.m,detail=role==="Owner"&&ownerViews[name]?ownerViews[name]:(roleExamples[role]&&roleExamples[role][name]?roleExamples[role][name]:'<p>Sample workspace for '+name+'</p>');app.innerHTML='<div class="shell"><section class="card workspace"><button class="back orbit-back">← Back to '+role+' Orbit</button><div class="workspace-circle module-demo"><small>'+role.toUpperCase()+' WORKSPACE</small><h2>'+name+'</h2>'+detail+'</div></section></div>';document.querySelector(".back").onclick=()=>portal(role)}home();
