@@ -10,7 +10,7 @@ function saveState(st){localStorage.setItem("smeState",JSON.stringify(st))}
 function money(n){return "₱"+Number(n||0).toLocaleString()}
 
 function home(){const entries=Object.entries(roles);app.innerHTML='<div class="shell"><section class="card orbit-first"><div class="orbit role-orbit"><div class="center"><div><strong>COMMAND<br>CENTER</strong><br><span>Choose a role</span></div></div>'+entries.map(([r,d],i)=>'<button class="module role-node" data-role="'+r+'" style="'+pos(i,entries.length)+'">'+r.toUpperCase()+'</button>').join("")+'</div><div class="orbit-caption"><small>SME BUSINESS COMMAND CENTER</small><h1>Choose Your Portal</h1></div></section></div>';document.querySelectorAll("[data-role]").forEach(b=>b.onclick=()=>portal(b.dataset.role))}
-function portal(role){let d=roles[role],st=loadState();if(role==="Owner"){d={...d,summary:money(st.sales)+" Today"}}app.innerHTML='<div class="shell"><section class="card portal-orbit-only"><button class="back floating-back">← Roles</button><div class="portal-label"><small>SME COMMAND CENTER</small><h2>'+role+' Portal</h2></div><div class="orbit"><button class="center center-action" id="orbitCenter" type="button"><div><strong>'+d.center+'</strong><br><span>'+d.summary+'</span><em>'+(role==="Owner"?'3 alerts • tap for snapshot':'Tap for snapshot')+'</em></div></button>'+d.modules.map((m,i)=>'<button class="module" data-m="'+m+'" style="'+pos(i,d.modules.length)+'">'+m+'</button>').join("")+'</div></section></div>';document.querySelector(".back").onclick=home;document.querySelector("#orbitCenter").onclick=()=>openPulse(role);document.querySelectorAll(".module").forEach(b=>b.onclick=()=>openModule(role,b))}
+function portal(role){let d=roles[role],st=loadState();if(role==="Owner"){d={...d,summary:money(st.sales)+" Today"}}app.innerHTML='<div class="shell"><section class="card portal-orbit-only"><button class="back floating-back">← Roles</button><div class="portal-label"><small>SME COMMAND CENTER</small><h2>'+role+' Portal</h2></div><div class="orbit"><button class="center center-action" id="orbitCenter" type="button"><div><strong>'+d.center+'</strong><br><span>'+d.summary+'</span><em>Tap for snapshot</em></div></button>'+d.modules.map((m,i)=>'<button class="module'+(false?' new-feature':'')+'" data-m="'+m+'" style="'+pos(i,d.modules.length)+'">'+m+(false?'<span class="new-badge">★ NEW</span>':'')+'</button>').join("")+'</div></section></div>';document.querySelector(".back").onclick=home;document.querySelector("#orbitCenter").onclick=()=>openPulse(role);document.querySelectorAll(".module").forEach(b=>b.onclick=()=>openModule(role,b))}
 function pos(i,n){let a=(i/n)*Math.PI*2-Math.PI/2,r=41,x=50+r*Math.cos(a),y=50+r*Math.sin(a);return 'left:'+x+'%;top:'+y+'%;transform:translate(-50%,-50%)'}
 const ownerViews={
 "Live Sales":'<div class="demo-grid"><div><small>TODAY</small><b>₱48,650</b></div><div><small>TRANSACTIONS</small><b>126</b></div><div><small>AVG ORDER</small><b>₱386</b></div></div><p>Recent: #0126 ₱650 • #0125 ₱420 • #0124 ₱1,080</p>',
@@ -21,18 +21,112 @@ const ownerViews={
 "Cash & Bank":'<div class="demo-grid"><div><small>CASH</small><b>₱18,450</b></div><div><small>GCASH</small><b>₱12,800</b></div><div><small>CARD</small><b>₱17,400</b></div></div><p>Expected ₱18,450 • Actual ₱18,450 • Variance ₱0</p><button class="action">Reconcile Shift</button>',
 "Suppliers & Purchasing":'<div class="demo-grid"><div><small>SUPPLIERS</small><b>12</b></div><div><small>OPEN PO</small><b>3</b></div><div><small>PAYABLE</small><b>₱24,600</b></div></div><p>2 deliveries arriving today</p><button class="action">+ Create PO</button>',
 "Reports":'<div class="report-modules"><button class="report-module" type="button"><b>Daily Sales</b><span>₱48,650 • 126 transactions</span></button><button class="report-module" type="button"><b>Cash Flow</b><span>In ₱48,650 • Out ₱12,410 • Net ₱36,240</span></button><button class="report-module" type="button"><b>Profit & Loss</b><span>Revenue • COGS • Expenses • Net Profit</span></button><button class="report-module" type="button"><b>Inventory Movement</b><span>Stock In • Stock Out • Adjustments</span></button><button class="report-module" type="button"><b>Expenses</b><span>Today ₱12,410</span></button><button class="report-module" type="button"><b>Exceptions</b><span>2 items need review</span></button></div><a class="action export-link" href="?screen=pdf">Export PDF</a> <a class="action export-link" href="?screen=excel">Export Excel</a>',
-"Notification Center":'<div class="alerts-list"><button class="alert-item urgent" data-target="Inventory"><b>Low Stock</b><span>3 products need attention</span></button><button class="alert-item" data-target="Approvals"><b>Approval Required</b><span>2 requests are waiting</span></button><button class="alert-item" data-target="Cash & Bank"><b>Cash Check</b><span>Review today’s reconciliation</span></button><button class="alert-item" data-target="Suppliers & Purchasing"><b>Supplier Delivery</b><span>2 deliveries arriving today</span></button><button class="alert-item" data-target="Profit & Expenses"><b>Expense Activity</b><span>View the latest recorded expense</span></button></div><p class="alert-hint">Tap an alert to open its workspace.</p>'
+"Notification Center":'<div class="alerts-list"><button class="alert-item urgent" data-target="Inventory"><b>Low Stock</b><span>3 products need attention</span></button><button class="alert-item" data-target="Approvals"><b>Approval Required</b><span>2 requests are waiting</span></button><button class="alert-item" data-target="Cash & Bank"><b>Cash Check</b><span>Review today’s reconciliation</span></button><button class="alert-item" data-target="Suppliers & Purchasing"><b>Supplier Delivery</b><span>2 deliveries arriving today</span></button><button class="alert-item" data-target="Profit & Expenses"><b>Expense Activity</b><span>View latest recorded expense</span></button></div>'
 };
+const roleExamples={
+Manager:{
+"Operations":'<div class="demo-grid"><div><small>OPEN ORDERS</small><b>14</b></div><div><small>ISSUES</small><b>2</b></div><div><small>ON SHIFT</small><b>8</b></div></div><button class="action">View Operations</button>',
+"Staff Scheduling":'<p>Donna 8AM–5PM • Carlo 9AM–6PM • Mia 10AM–7PM</p><button class="action">Reassign Shift</button>',
+"Inventory":'<p>Milk 4 left • Cups 12 left • Syrup 2 left</p><button class="action">Stock Count</button>',
+"Purchase Orders":'<p>PO-204 ₱8,500 Pending • PO-203 ₱12,300 In Transit</p><button class="action">+ Create PO</button>',
+"Approvals":'<p>2 staff requests awaiting approval</p><button class="action">Approve Request</button>',
+"Reports":'<p>Branch Sales • Staff • Inventory • Exceptions</p><button class="action">Export Report</button>'},
+Cashier:{
+"POS":'<p>Iced Coffee ₱180 • Sandwich ₱220 • Cake ₱160</p><button class="action">Add to Cart</button><button class="action">Checkout</button>',
+"Orders":'<p>#126 Preparing • #125 Ready • #124 Completed</p><button class="action">Mark Ready</button>',
+"Payments":'<p>Total ₱650</p><button class="action">Cash</button> <button class="action">GCash</button> <button class="action">Card</button>',
+"Discounts":'<p>Senior • PWD • Promo</p><button class="action">Apply Discount</button>',
+"Returns":'<p>Receipt #1048 • ₱1,250</p><button class="action">Process Return</button>',
+"Shift Reconciliation":'<p>Expected ₱18,450 • Actual ₱18,450 • Variance ₱0</p><button class="action">Close Shift</button>'},
+Staff:{
+"Tasks":'<p>Restock cups • Clean counter • Prepare pickup #126</p><button class="action">Complete Task</button>',
+"Attendance":'<p>Clocked in 8:03 AM</p><button class="action">Clock Out</button>',
+"Orders":'<p>#126 Assigned • Preparing</p><button class="action">Update Status</button>',
+"Stock Requests":'<p>Request: Milk × 12</p><button class="action">Submit Request</button>',
+"Notifications":'<p>Shift updated • Stock request approved • Manager announcement</p><button class="action">Mark Read</button>'}};
 function openPulse(role){
- const st=loadState();
  const data={
-  Owner:{title:"Executive Snapshot",items:[["Sales Today",money(st.sales)],["Expenses",money(st.expenses)],["Est. Profit",money(st.profit)],["Alerts",String(st.alerts)]],note:"Live values saved on this device"},
+  Owner:{title:"Executive Snapshot",items:[["Sales Today",money(loadState().sales)],["Expenses",money(loadState().expenses)],["Est. Profit",money(loadState().profit)],["Alerts",String(loadState().alerts)]],note:"Live values saved on this device"},
   Manager:{title:"Today’s Operations",items:[["On Shift","8"],["Open Orders","14"],["Low Stock","4"],["Approvals","2"]],note:"Operations live"},
   Cashier:{title:"Shift Summary",items:[["Shift Sales","₱21,840"],["Transactions","37"],["Variance","₱0"],["Terminal","01 • Open"]],note:"Current shift"},
   Staff:{title:"My Day",items:[["Clock In","8:03 AM"],["Tasks Left","3"],["Orders","1"],["Alerts","2"]],note:"Shift activity"}
  }[role];
- app.innerHTML='<div class="shell"><section class="card workspace"><button class="back orbit-back">← Back to '+role+' Orbit</button><div class="workspace-circle module-demo pulse-view"><small>'+role.toUpperCase()+' • ORBIT CENTER</small><h2>'+data.title+'</h2><div class="pulse-grid">'+data.items.map(x=>'<div><small>'+x[0]+'</small><b>'+x[1]+'</b></div>').join("")+'</div><p>'+data.note+'</p>'+(role==="Owner"?'<button class="action primary" id="openNotifications">Open Notification Center</button>':'')+'</div></section></div>';
- document.querySelector(".back").onclick=function(){portal(role)};
- const n=document.querySelector("#openNotifications");if(n)n.onclick=function(){openModule("Owner",{dataset:{m:"Notification Center"}})};
+ app.innerHTML='<div class="shell"><section class="card workspace"><button class="back orbit-back">← Back to '+role+' Orbit</button><div class="workspace-circle module-demo pulse-view"><small>'+role.toUpperCase()+' • ORBIT CENTER</small><h2>'+data.title+'</h2><div class="pulse-grid">'+data.items.map(x=>'<div><small>'+x[0]+'</small><b>'+x[1]+'</b></div>').join("")+'</div><p>'+data.note+'</p></div></section></div>';
+ document.querySelector(".back").onclick=()=>portal(role);const nc=document.querySelector("#openNotifications");if(nc)nc.onclick=()=>openModule("Owner",{dataset:{m:"Notification Center"}});
 }
-
+function openModule(role,b){let name=b.dataset.m,st=loadState();if(role==="Owner"&&name==="Cash & Bank"){ownerViews[name]='<div class="demo-grid"><div><small>CASH</small><b>'+money(st.cash)+'</b></div><div><small>GCASH</small><b>₱12,800</b></div><div><small>CARD</small><b>₱17,400</b></div></div><p>Updated from saved business activity</p><button class="action">Reconcile Shift</button>'}if(role==="Owner"&&name==="Reports"){ownerViews[name]=ownerViews[name].replace(/Today ₱[\d,]+/,'Today '+money(st.expenses))}if(role==="Owner"&&name==="Profit & Expenses"){ownerViews[name]='<div class="demo-grid"><div><small>REVENUE</small><b>'+money(st.sales)+'</b></div><div><small>EXPENSES</small><b>'+money(st.expenses)+'</b></div><div><small>EST. PROFIT</small><b>'+money(st.profit)+'</b></div></div>'+(st.lastExpense?'<p>Last expense: '+st.lastExpense.type+' • '+money(st.lastExpense.amount)+'</p>':'')+'<button class="action">+ Add Expense</button>'}let detail=role==="Owner"&&ownerViews[name]?ownerViews[name]:(roleExamples[role]&&roleExamples[role][name]?roleExamples[role][name]:'<p>Sample workspace for '+name+'</p>');app.innerHTML='<div class="shell"><section class="card workspace"><button class="back orbit-back">← Back to '+role+' Orbit</button><div class="workspace-circle module-demo"><small>'+role.toUpperCase()+' WORKSPACE</small><h2>'+name+'</h2>'+detail+'</div></section></div>';document.querySelector(".back").onclick=()=>portal(role);bindActions(role,name);document.querySelectorAll(".alert-item").forEach(a=>a.onclick=()=>openModule("Owner",{dataset:{m:a.dataset.target}}))}
+function bindActions(role,name){
+ const pdf=document.querySelector("#exportPDF"),excel=document.querySelector("#exportExcel");
+ if(pdf) pdf.onclick=function(e){e.preventDefault();e.stopPropagation();showExportPreview("PDF")};
+ if(excel) excel.onclick=function(e){e.preventDefault();e.stopPropagation();showExportPreview("Excel")};
+ document.querySelectorAll(".report-module").forEach(btn=>btn.onclick=function(e){e.preventDefault();reportDetail(role,name,(this.querySelector("b")||this).textContent.trim())});
+ document.querySelectorAll(".action:not(.export-btn)").forEach(btn=>btn.onclick=function(){
+   let label=this.textContent.trim();
+   if(/create\s*p\.?\s*o/i.test(label)) return poForm(role,name);
+   if(role==="Owner"&&name==="Profit & Expenses"&&/add expense/i.test(label)) return addExpenseForm();
+   this.textContent="✓ "+label.replace(/^✓ /,"");this.disabled=true;
+ });
+}
+function addExpenseForm(){
+ const el=document.querySelector(".module-demo");
+ el.innerHTML='<small>OWNER WORKSPACE</small><h2>Add Expense</h2><div class="po-form"><label>Expense Type<select id="expenseType"><option>Supplies</option><option>Utilities</option><option>Rent</option><option>Payroll</option><option>Other</option></select></label><label>Amount<input id="expenseAmount" type="number" value="850"></label><label>Date<input id="expenseDate" type="date"></label><label>Reference<input id="expenseRef" value="OR-2026-001"></label><label style="grid-column:1/-1">Notes<textarea id="expenseNotes">Business expense</textarea></label></div><button class="action primary" id="saveExpense">Save Expense</button> <button class="action" id="cancelExpense">Cancel</button>';
+ document.querySelector("#saveExpense").onclick=function(){
+   const amount=Number(document.querySelector("#expenseAmount").value||0);
+   const type=document.querySelector("#expenseType").value;
+   const st=loadState(),previous=st.expenses;
+   st.expenses+=amount;st.profit=Math.max(0,st.profit-amount);st.cash=Math.max(0,st.cash-amount);st.lastExpense={type:type,amount:amount,at:new Date().toISOString()};saveState(st);
+   el.innerHTML='<small>EXPENSE RECORDED</small><h2>'+money(amount)+'</h2><span class="status approved">Saved</span><p>'+type+' has been added and synced across the Owner portal.</p><div class="demo-grid"><div><small>PREVIOUS EXPENSES</small><b>'+money(previous)+'</b></div><div><small>UPDATED EXPENSES</small><b>'+money(st.expenses)+'</b></div><div><small>UPDATED PROFIT</small><b>'+money(st.profit)+'</b></div></div><button class="action primary" id="anotherExpense">+ Add Another</button> <button class="action" id="backProfit">← Profit & Expenses</button>';
+   document.querySelector("#anotherExpense").onclick=addExpenseForm;
+   document.querySelector("#backProfit").onclick=function(){openModule("Owner",{dataset:{m:"Profit & Expenses"}})};
+ };
+ document.querySelector("#cancelExpense").onclick=function(){openModule("Owner",{dataset:{m:"Profit & Expenses"}})};
+}
+function poForm(role,name){
+ const el=document.querySelector(".module-demo");
+ el.classList.add("po-open");
+ el.innerHTML='<small>'+role.toUpperCase()+' WORKSPACE</small><h2>Create Purchase Order</h2><div class="po-form"><label>Supplier<input value="Metro Supply Co."></label><label>Item<input value="Premium Coffee Beans"></label><label>Quantity<input type="number" value="20"></label><label>Unit Cost<input type="number" value="425"></label><label>Delivery Date<input type="date"></label><label>Notes<textarea>Restock for next week</textarea></label><button class="action" id="savePO">Create P.O.</button></div>';
+ document.querySelector("#savePO").onclick=function(){poCreated(role)};
+}
+function poCreated(role){
+ const el=document.querySelector(".module-demo");
+ el.innerHTML='<small>PURCHASE ORDER CREATED</small><h2>PO-205</h2><span class="status pending">Pending Approval</span><p>Metro Supply Co.<br>20 × Premium Coffee Beans<br>Total: ₱8,500</p><div class="po-actions"><button class="action primary" id="submitPO">Submit for Approval</button><button class="action" id="editPO">Edit</button><button class="action danger" id="cancelPO">Cancel</button></div>';
+ document.querySelector("#submitPO").onclick=function(){poSubmitted(role)};
+ document.querySelector("#editPO").onclick=function(){poForm(role,"Suppliers & Purchasing")};
+ document.querySelector("#cancelPO").onclick=function(){portal(role)};
+}
+function poSubmitted(role){
+ const el=document.querySelector(".module-demo");
+ el.innerHTML='<small>PURCHASE ORDER</small><h2>PO-205</h2><span class="status submitted">Submitted for Approval</span><p>Metro Supply Co. • ₱8,500</p><button class="action primary" id="openApproval">Open Approval</button>';
+ document.querySelector("#openApproval").onclick=function(){approvalPO(role)};
+}
+function approvalPO(role){
+ const el=document.querySelector(".module-demo");
+ el.innerHTML='<small>OWNER APPROVAL</small><h2>PO-205</h2><span class="status submitted">Awaiting Decision</span><p>Metro Supply Co.<br>20 × Premium Coffee Beans<br>Total ₱8,500</p><button class="action primary" id="approvePO">Approve P.O.</button> <button class="action danger" id="rejectPO">Reject</button>';
+ document.querySelector("#approvePO").onclick=function(){poApproved(role)};
+ document.querySelector("#rejectPO").onclick=function(){portal(role)};
+}
+function poApproved(role){
+ const el=document.querySelector(".module-demo");
+ el.innerHTML='<small>PURCHASE ORDER</small><h2>PO-205</h2><span class="status approved">Approved</span><p>Ready to send to Metro Supply Co.</p><button class="action primary" id="sendSupplier">Send to Supplier</button>';
+ const btn=document.querySelector("#sendSupplier");
+ btn.onclick=function(){
+   document.querySelector(".status").textContent="Sent to Supplier";
+   btn.textContent="Mark In Transit";
+   btn.onclick=function(){
+     document.querySelector(".status").textContent="In Transit";
+     btn.textContent="Mark Received";
+     btn.onclick=function(){
+       document.querySelector(".status").textContent="Received";
+       btn.outerHTML='<p class="success-note">✓ Inventory updated: +20 Premium Coffee Beans</p>';
+     };
+   };
+ };
+}
+function showExportPreview(type){document.querySelector(".module-demo").innerHTML='<small>OWNER REPORT EXPORT</small><h2>'+type+' Export</h2><div class="report-preview"><div><span>Daily Sales</span><b>₱48,650</b></div><div><span>Transactions</span><b>126</b></div><div><span>Cash Flow</span><b>₱36,240</b></div><div><span>Expenses</span><b>₱12,410</b></div></div><p>Your report is ready.</p><button class="action primary" id="confirmExport">Continue '+type+'</button><button class="action" id="cancelExport">← Reports</button>';document.querySelector("#confirmExport").onclick=()=>exportReport(type.toLowerCase());document.querySelector("#cancelExport").onclick=()=>openReportsAgain()}
+function openReportsAgain(){let fake={dataset:{m:"Reports"}};openModule("Owner",fake)}
+function exportReport(type){let rows=[["Daily Sales","₱48,650"],["Transactions","126"],["Cash In","₱48,650"],["Cash Out","₱12,410"],["Net Cash Flow","₱36,240"],["Expenses","₱12,410"]];if(type==="excel"){let csv="Report,Value\n"+rows.map(r=>r.join(",")).join("\n");let blob=new Blob(["\ufeff"+csv],{type:"text/csv;charset=utf-8"}),a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="SME-Owner-Report.csv";document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},1000);return}document.querySelector(".module-demo").innerHTML='<small>PRINTABLE OWNER REPORT</small><h2>Daily Business Report</h2><div class="report-preview">'+rows.map(r=>'<div><span>'+r[0]+'</span><b>'+r[1]+'</b></div>').join("")+'</div><p>Use your browser Print menu and choose Save as PDF.</p><button class="action primary" id="printReport">Print / Save PDF</button><button class="action" id="backReports2">← Reports</button>';document.querySelector("#printReport").onclick=()=>window.print();document.querySelector("#backReports2").onclick=()=>portal("Owner")}
+function reportDetail(role,name,label){document.querySelector(".module-demo").innerHTML='<small>OWNER REPORT</small><h2>'+label+'</h2><div class="demo-grid"><div><small>TODAY</small><b>₱48,650</b></div><div><small>YESTERDAY</small><b>₱44,210</b></div><div><small>CHANGE</small><b>+10%</b></div></div><p>Sample detailed '+label+' report.</p><button class="action" id="backReports">← Reports</button>';document.querySelector("#backReports").onclick=()=>portal(role)}
+const screen=new URLSearchParams(location.search).get("screen");
+if(screen==="pdf"){app.innerHTML='<div class="shell"><section class="card workspace"><div class="workspace-circle module-demo"><small>OWNER REPORT</small><h2>PDF Report</h2><div class="report-preview"><div><span>Daily Sales</span><b>₱48,650</b></div><div><span>Transactions</span><b>126</b></div><div><span>Cash Flow</span><b>₱36,240</b></div><div><span>Expenses</span><b>₱12,410</b></div></div><button class="action primary" onclick="window.print()">Print / Save PDF</button><a class="action export-link" href="./">← Back</a></div></section></div>'}
+else if(screen==="excel"){app.innerHTML='<div class="shell"><section class="card workspace"><div class="workspace-circle module-demo"><small>OWNER REPORT</small><h2>Excel Export</h2><div class="report-preview"><div><span>Daily Sales</span><b>₱48,650</b></div><div><span>Transactions</span><b>126</b></div><div><span>Cash Flow</span><b>₱36,240</b></div><div><span>Expenses</span><b>₱12,410</b></div></div><button class="action primary" id="downloadCsv">Download CSV</button><a class="action export-link" href="./">← Back</a></div></section></div>';document.querySelector("#downloadCsv").onclick=()=>{let csv="Report,Value\nDaily Sales,48650\nTransactions,126\nCash Flow,36240\nExpenses,12410";let a=document.createElement("a");a.href="data:text/csv;charset=utf-8,%EF%BB%BF"+encodeURIComponent(csv);a.download="SME-Owner-Report.csv";a.click()}}
+else home();
